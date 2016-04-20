@@ -47,10 +47,16 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BetFairFeedService\BetFairFeedService\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -72,13 +78,29 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.vb">
+    <Compile Include="AccountClass.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="BefFairFootballEventClass.vb" />
+    <Compile Include="BetFairDatabaseClass.vb" />
+    <Compile Include="EventLogger.vb" />
+    <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <Compile Include="frmMain.Designer.vb">
+      <DependentUpon>frmMain.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="IClient.vb" />
+    <Compile Include="JsonRpcClient.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Json\JsonConvert.vb" />
+    <Compile Include="Json\JsonRequest.vb" />
+    <Compile Include="Json\JsonResponse.vb" />
+    <Compile Include="Json\RescriptRequest.vb" />
+    <Compile Include="MatchedEventClass.vb" />
+    <Compile Include="modGlobals.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -94,8 +116,57 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ResponseClass.vb" />
+    <Compile Include="TO\APINGException.vb" />
+    <Compile Include="TO\Competition.vb" />
+    <Compile Include="TO\CompetitionResult.vb" />
+    <Compile Include="TO\Event.vb" />
+    <Compile Include="TO\EventResult.vb" />
+    <Compile Include="TO\EventType.vb" />
+    <Compile Include="TO\EventTypeResult.vb" />
+    <Compile Include="TO\ExBestOffersOverrides.vb" />
+    <Compile Include="TO\Exception.vb" />
+    <Compile Include="TO\ExchangePrices.vb" />
+    <Compile Include="TO\ExecutionReportErrorCode.vb" />
+    <Compile Include="TO\ExecutionReportStatus.vb" />
+    <Compile Include="TO\InstructionReportErrorCode.vb" />
+    <Compile Include="TO\InstructionReportStatus.vb" />
+    <Compile Include="TO\LimitOnCloseOrder.vb" />
+    <Compile Include="TO\LimitOrder.vb" />
+    <Compile Include="TO\MarketBettingType.vb" />
+    <Compile Include="TO\MarketBook.vb" />
+    <Compile Include="TO\MarketCatalogue.vb" />
+    <Compile Include="TO\MarketDescription.vb" />
+    <Compile Include="TO\MarketFilter.vb" />
+    <Compile Include="TO\MarketOnCloseOrder.vb" />
+    <Compile Include="TO\MarketProjection.vb" />
+    <Compile Include="TO\MarketSort.vb" />
+    <Compile Include="TO\MarketStatus.vb" />
+    <Compile Include="TO\Match.vb" />
+    <Compile Include="TO\MatchProjection.vb" />
+    <Compile Include="TO\Order.vb" />
+    <Compile Include="TO\OrderProjection.vb" />
+    <Compile Include="TO\OrderStatus.vb" />
+    <Compile Include="TO\OrderType.vb" />
+    <Compile Include="TO\PersistenceType.vb" />
+    <Compile Include="TO\PlaceExecutionReport.vb" />
+    <Compile Include="TO\PlaceInstruction.vb" />
+    <Compile Include="TO\PlaceInstructionReport.vb" />
+    <Compile Include="TO\PriceData.vb" />
+    <Compile Include="TO\PriceProjection.vb" />
+    <Compile Include="TO\PriceSize.vb" />
+    <Compile Include="TO\RollUpModel.vb" />
+    <Compile Include="TO\Runner.vb" />
+    <Compile Include="TO\RunnerDescription.vb" />
+    <Compile Include="TO\RunnerStatus.vb" />
+    <Compile Include="TO\Side.vb" />
+    <Compile Include="TO\StartingPrices.vb" />
+    <Compile Include="TO\TimeRange.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
