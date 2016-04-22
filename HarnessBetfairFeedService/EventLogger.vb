@@ -35,18 +35,8 @@ Public Class EventLogger
         ' Write to Event Logs
         Try
 
-            ''register the Application as an Event Source
-            'If Not EventLog.SourceExists(My.Settings.AdapterName) Then
-            ' EventLog.CreateEventSource(My.Settings.AdapterName, My.Settings.AdapterName + "_Log")
-            'End If
-
-            '' Log the entry with the Windows Event Logs.
-            'objEventLog.Source = My.Settings.AdapterName
-            'entry = My.Settings.AdapterName + ": " + entry
-            'objEventLog.WriteEntry(entry, eventType)
-
             ' Always write to text log file in application directory
-            strLogFile = My.Settings.ProcessLogPath & "BetFairFeedService_Log_File_" & Format(Now, "_yyyy_MM_dd") & ".txt"
+            strLogFile = My.Settings.ProcessLogPath & "BetFairFeedService_Stream" & globalStreamSportId.ToString & "_" & globalStreamName & "_Log_File_" & Format(Now, "_yyyy_MM_dd") & ".txt"
             FileOpen(intFileNumber, strLogFile, OpenMode.Append)
             Dim strDate As String = Format(Now, "yyyy-MM-dd")
             Dim strTimestamp As String = Format(Now, "HH.mm.ss.ffffff")

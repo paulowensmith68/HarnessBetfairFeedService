@@ -16,10 +16,11 @@
     Public globalBetFairUrl As String = My.Settings.BetFairApiUrl
 
     '-------------------------------------------------
-    '-   BetFair Filter arrays                             -
+    '-   BetFair Filter                           -
     '-------------------------------------------------
-    Public globalBetFairFootballDaysAhead As Integer = My.Settings.FootballDaysAhead
-    Public globalBetFairHorseRacingDaysAhead As Integer = My.Settings.HorseRacingDaysAhead
+    Public globalBetFairDaysAhead As Integer = My.Settings.DaysAhead
+    Public globalStreamSportId As Integer = My.Settings.StreamSportId
+    Public globalStreamName As String = My.Settings.StreamSportName
 
     '-------------------------------------------------
     '-   Logging objects                             -

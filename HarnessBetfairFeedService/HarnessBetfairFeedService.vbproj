@@ -117,6 +117,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ResponseClass.vb" />
+    <Compile Include="Settings.vb" />
     <Compile Include="TO\APINGException.vb" />
     <Compile Include="TO\Competition.vb" />
     <Compile Include="TO\CompetitionResult.vb" />

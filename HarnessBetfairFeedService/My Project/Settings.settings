@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
   <Profiles />
   <Settings>
-    <Setting Name="ProcessCycleEverySecs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">720</Value>
-    </Setting>
     <Setting Name="ProcessLogPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\#myPrograms\BetFairFeedService\logs\</Value>
     </Setting>
@@ -27,11 +24,23 @@
     <Setting Name="BetFairApiUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://api.betfair.com/exchange/betting</Value>
     </Setting>
-    <Setting Name="FootballDaysAhead" Type="System.Int32" Scope="User">
+    <Setting Name="StreamSportId" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="StreamSportName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Soccer</Value>
+    </Setting>
+    <Setting Name="DaysAhead" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
-    <Setting Name="HorseRacingDaysAhead" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">3</Value>
+    <Setting Name="NumberOfEuropenEvents" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="NumberOfUkEvents" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="ProcessCycleEverySecs" Type="System.String" Scope="User">
+      <Value Profile="(Default)">120</Value>
     </Setting>
   </Settings>
 </SettingsFile>

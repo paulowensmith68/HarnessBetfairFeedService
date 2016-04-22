@@ -1,6 +1,7 @@
 ﻿Imports MySql.Data.MySqlClient
-Imports BetFairFeedService.Api_ng_sample_code.TO
-Imports BetFairFeedService.Api_ng_sample_code
+Imports HarnessBetfairFeedService.Api_ng_sample_code.TO
+Imports HarnessBetfairFeedService.Api_ng_sample_code
+
 Public Class BetFairDatabaseClass
 
     ' Holds the connection string to the database used.
@@ -15,7 +16,7 @@ Public Class BetFairDatabaseClass
     Private insertCount As Integer = 0
     Private updateCount As Integer = 0
 
-    Public Sub PollBetFairEvents(eventTypeId As Integer, marketTypeCode As String, maxResults As String, marketCountries As HashSet(Of String))
+    Public Sub PollBetFairEvents(eventTypeId As Integer, marketTypeCode As String, maxResults As String, marketCountries As HashSet(Of String), blnDeleteAll As Boolean)
 
         Dim Account As New AccountClass()
         Dim newEvent As BefFairFootballEventClass
@@ -40,7 +41,7 @@ Public Class BetFairDatabaseClass
             'ListMarketCatalogue parameters
             Dim time = New TimeRange()
             time.From = Date.Now
-            time.To = Date.Now.AddDays(globalBetFairFootballDaysAhead)
+            time.To = Date.Now.AddDays(globalBetFairDaysAhead)
 
             marketFilter = New MarketFilter()
             marketFilter.EventTypeIds = eventypeIds
@@ -154,7 +155,7 @@ Public Class BetFairDatabaseClass
         '' Write to database
         Dim strResult As String
         gobjEvent.WriteToEventLog("BetFairDatabaseClass : Starting database update . . . . ", EventLogEntryType.Information)
-        strResult = WriteEventList(eventTypeId, marketTypeCode)
+        strResult = WriteEventList(eventTypeId, marketTypeCode, blnDeleteAll)
         gobjEvent.WriteToEventLog("BetFairDatabaseClass : Response from Database Update: : " + strResult, EventLogEntryType.Information)
 
     End Sub
@@ -164,7 +165,7 @@ Public Class BetFairDatabaseClass
         Return s.marketId Is Nothing
 
     End Function
-    Public Sub MatchWithBookmakers(ByVal eventTypeId As Integer, ByVal marketTypeCode As String)
+    Public Sub MatchSoccerWithBookmakers(ByVal eventTypeId As Integer, ByVal marketTypeCode As String)
         '-----------------------------------------------------------------------*
         ' Sub Routine parameters                                                *
         ' -----------------------                                               *
@@ -200,7 +201,7 @@ Public Class BetFairDatabaseClass
 
                 While drBetfairEvents.Read()
 
-                    ' Declare fro later
+                    ' Declare for later
                     Dim intEventIdSpocosy As Integer
 
                     ' Declare and populate fields
@@ -223,9 +224,15 @@ Public Class BetFairDatabaseClass
                     ' |     * Event Name                                               | 
                     ' |     * Event Date                                               |
                     ' \----------------------------------------------------------------/
-                    cmdEvent.CommandText = "select `id`, date_format(startDate, '%Y-%m-%d') from event AS e where e.`name` =@eventName"
+                    cmdEvent.CommandText = "select `id`, date_format(startDate, '%Y-%m-%d') from event AS e where e.`name` =@eventName AND " &
+                                           "date(e.startdate) = str_to_date(@startDate, '%Y-%m-%d')"
                     strConvertedDeatils = ConvertEventName(eventTypeId, strBetfairEventName)
-                    cmdEvent.Parameters.AddWithValue("eventName", ConvertEventName(eventTypeId, strBetfairEventName))
+                    cmdEvent.Parameters.AddWithValue("eventName", strConvertedDeatils)
+                    Dim strBetfairOpenDate As String = dtBetfairOpenDate.ToString("yyyy-MM-dd")
+                    cmdEvent.Parameters.AddWithValue("startDate", strBetfairOpenDate)
+
+                    ' Reset matched event id
+                    intEventIdSpocosy = 0
 
                     Try
                         cno2.Open()
@@ -234,7 +241,6 @@ Public Class BetFairDatabaseClass
                         While drEvent.Read()
 
                             Dim event_date As DateTime = drEvent.GetDateTime(1)
-                            Dim strBetfairOpenDate As String = dtBetfairOpenDate.ToString("yyyy-MM-dd")
                             Dim strEventDate As String = event_date.ToString("yyyy-MM-dd")
                             If strBetfairOpenDate = strEventDate Then
 
@@ -252,8 +258,58 @@ Public Class BetFairDatabaseClass
                     End Try
 
 
-                    ' Get the bet offers
+                    '
+                    ' Attempt a fuzzy match, using wilcard name and date
+                    '
+                    If intEventIdSpocosy = 0 Then
 
+                        ' Open new cursor
+                        Dim cno3 As MySqlConnection = New MySqlConnection(connectionString)
+                        Dim drFuzzyEvent As MySqlDataReader
+                        Dim cmdFuzzyEvent As New MySqlCommand
+
+                        ' /----------------------------------------------------------------\
+                        ' | MySql Select                                                   |
+                        ' | Get Spocosy event identifier using:-                           |
+                        ' |     * Event Name                                               | 
+                        ' |     * Event Date                                               |
+                        ' \----------------------------------------------------------------/
+                        cmdFuzzyEvent.CommandText = "select `id`, date_format(startDate, '%Y-%m-%d') from event AS e where e.`name` like @eventFuzzyName AND " &
+                                                    "date(e.startdate) = str_to_date(@startDate, '%Y-%m-%d')"
+                        Dim strFuzzyEventNameHome As String = strBetfairEventName.Substring(0, InStr(1, strBetfairEventName, " v "))
+                        Dim strFuzzyEventNameAway As String = strBetfairEventName.Substring(Len(strFuzzyEventNameHome) + 2)
+                        cmdFuzzyEvent.Parameters.AddWithValue("eventFuzzyName", "%" + strFuzzyEventNameHome + "%-%" + strFuzzyEventNameAway + "%")
+                        cmdFuzzyEvent.Parameters.AddWithValue("startDate", strBetfairOpenDate)
+
+                        ' Reset matched id
+                        intEventIdSpocosy = 0
+
+                        Try
+                            cno3.Open()
+                            cmdFuzzyEvent.Connection = cno3
+                            drFuzzyEvent = cmdFuzzyEvent.ExecuteReader()
+                            While drFuzzyEvent.Read()
+
+                                Dim event_date As DateTime = drFuzzyEvent.GetDateTime(1)
+                                Dim strEventDate As String = event_date.ToString("yyyy-MM-dd")
+                                If strBetfairOpenDate = strEventDate Then
+
+                                    ' Declare and populate fields
+                                    intEventIdSpocosy = drEvent.GetInt64(0)
+
+                                End If
+                            End While
+                        Catch ex As System.Exception
+                        Finally
+                            cno3.Close()
+                        End Try
+
+                    End If
+
+
+                    '
+                    ' Get the bet offers
+                    '
                     If intEventIdSpocosy > 0 Then
 
                         Dim drBetOffer As MySqlDataReader
@@ -320,37 +376,14 @@ Public Class BetFairDatabaseClass
                                         ' Calculate rating 
                                         Dim dblRating As Double = odds / dbBetfairPrice * 100
 
-                                        ' Resolve bookmaker to image
-                                        'Dim strBookmakerImage As String = "/images/noimage.png"
-                                        Dim strBookmakerImage As String = "/images/" + provider_name + ".png"
-
-                                        If provider_name = "Bet365" Then
-                                            strBookmakerImage = "/images/bet365.png"
-
-                                        ElseIf provider_name = "Betfair Exchange" Then
-                                            strBookmakerImage = "/images/betfair_h.gif"
-
-                                        ElseIf provider_name = "William Hill" Then
-                                            strBookmakerImage = "/images/wh.png"
-
-                                        ElseIf provider_name = "Coral" Then
-                                            strBookmakerImage = "/images/coral_h.gif"
-
-                                        ElseIf provider_name = "Ladbrokes" Then
-                                            strBookmakerImage = "/images/ladbrokes.png"
-
-                                        ElseIf provider_name = "Paddy Power" Then
-                                            strBookmakerImage = "/images/paddy_power.png"
-
-                                        ElseIf provider_name = "Stan James" Then
-                                            strBookmakerImage = "/images/stan.png"
-
-                                        ElseIf provider_name = "Intralot.it" Then
-                                            strBookmakerImage = "/images/intralot.png"
-
-                                        ElseIf provider_name = "24hPoker" Then
-                                            strBookmakerImage = "/images/24hPoker.png"
-                                        End If
+                                        ' Resolve bookmaker name to image
+                                        Dim strBookmakerImageName = provider_name
+                                        strBookmakerImageName = strBookmakerImageName.Replace(" ", "_")
+                                        strBookmakerImageName = strBookmakerImageName.Replace(".", "")
+                                        strBookmakerImageName = strBookmakerImageName.Replace("-", "_")
+                                        strBookmakerImageName = strBookmakerImageName.Replace("-", "_")
+                                        strBookmakerImageName = strBookmakerImageName.ToLower
+                                        Dim strBookmakerImage As String = "/images/" + strBookmakerImageName + ".png"
 
                                         'Create instance of Matched Event class
                                         newMatched = New MatchedEventClass With {
@@ -361,7 +394,7 @@ Public Class BetFairDatabaseClass
                                          .details = strBetfairEventName,
                                          .bookMaker = strBookmakerImage,
                                          .bet = strParticipant_name,
-                                         .exchange = "/images/betfair_h.gif",
+                                         .exchange = "/images/betfair_exchange.png",
                                          .type = marketTypeCode,
                                          .back = odds,
                                          .rating = dblRating
@@ -502,7 +535,7 @@ Public Class BetFairDatabaseClass
         Return strReturn
     End Function
 
-    Private Function WriteEventList(eventTypeId As Integer, marketTypeCode As String) As String ''
+    Private Function WriteEventList(eventTypeId As Integer, marketTypeCode As String, blnDeleteAll As Boolean) As String ''
         Dim cno As New MySqlConnection
         Dim cmd_del As New MySqlCommand
         Dim cmd As New MySqlCommand
@@ -543,10 +576,15 @@ Public Class BetFairDatabaseClass
             cmd.Transaction = SQLtrans
             Try
 
-                'Ok, delete all rows first
-                cmd_del.Parameters("@eventTypeId").Value = eventTypeId
-                cmd_del.Parameters("@marketTypeCode").Value = marketTypeCode
-                num_del += cmd_del.ExecuteNonQuery
+                ' Delete all first at start of refresh
+                If blnDeleteAll Then
+
+                    'Ok, delete all rows first
+                    cmd_del.Parameters("@eventTypeId").Value = eventTypeId
+                    cmd_del.Parameters("@marketTypeCode").Value = marketTypeCode
+                    num_del += cmd_del.ExecuteNonQuery
+
+                End If
 
                 'Ok, this is where the inserts really take place. All the stuff around
                 'is just to prepare for this and handle errors that may occur.

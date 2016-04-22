@@ -56,18 +56,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("720")>  _
-        Public Property ProcessCycleEverySecs() As Integer
-            Get
-                Return CType(Me("ProcessCycleEverySecs"),Integer)
-            End Get
-            Set
-                Me("ProcessCycleEverySecs") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("C:\#myPrograms\BetFairFeedService\logs\")>  _
         Public Property ProcessLogPath() As String
             Get
@@ -139,25 +127,73 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
-        Public Property FootballDaysAhead() As Integer
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property StreamSportId() As Integer
             Get
-                Return CType(Me("FootballDaysAhead"),Integer)
+                Return CType(Me("StreamSportId"),Integer)
             End Get
             Set
-                Me("FootballDaysAhead") = value
+                Me("StreamSportId") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Soccer")>  _
+        Public Property StreamSportName() As String
+            Get
+                Return CType(Me("StreamSportName"),String)
+            End Get
+            Set
+                Me("StreamSportName") = value
             End Set
         End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
-        Public Property HorseRacingDaysAhead() As Integer
+        Public Property DaysAhead() As Integer
             Get
-                Return CType(Me("HorseRacingDaysAhead"),Integer)
+                Return CType(Me("DaysAhead"),Integer)
             End Get
             Set
-                Me("HorseRacingDaysAhead") = value
+                Me("DaysAhead") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
+        Public Property NumberOfEuropenEvents() As Integer
+            Get
+                Return CType(Me("NumberOfEuropenEvents"),Integer)
+            End Get
+            Set
+                Me("NumberOfEuropenEvents") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("50")>  _
+        Public Property NumberOfUkEvents() As Integer
+            Get
+                Return CType(Me("NumberOfUkEvents"),Integer)
+            End Get
+            Set
+                Me("NumberOfUkEvents") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("120")>  _
+        Public Property ProcessCycleEverySecs() As String
+            Get
+                Return CType(Me("ProcessCycleEverySecs"),String)
+            End Get
+            Set
+                Me("ProcessCycleEverySecs") = value
             End Set
         End Property
     End Class
