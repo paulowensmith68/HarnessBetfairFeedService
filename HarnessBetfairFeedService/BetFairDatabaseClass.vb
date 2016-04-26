@@ -177,10 +177,7 @@ Public Class BetFairDatabaseClass
         Dim cno As MySqlConnection = New MySqlConnection(connectionString)
         Dim drBetfairEvents As MySqlDataReader
         Dim cmdBetfairEvents As New MySqlCommand
-        Dim strConvertedMarketTypeCode As String
 
-        ' Get equivalent market code to match bookmakers feed
-        strConvertedMarketTypeCode = ConvertMarketTypeCode(marketTypeCode)
         ' /----------------------------------------------------------------\
         ' | MySql Select                                                   |
         ' | Get all betfair_events for this eventTypeId and marketTypeCode |
@@ -216,7 +213,9 @@ Public Class BetFairDatabaseClass
                     Dim cno2 As MySqlConnection = New MySqlConnection(connectionString)
                     Dim drEvent As MySqlDataReader
                     Dim cmdEvent As New MySqlCommand
-                    Dim strConvertedDeatils As String
+                    Dim strConvertedDetails As String
+                    Dim strBetfairHomeTeam As String = GetBetfairFootballTeam(True, strBetfairEventName)
+                    Dim strBetfairAwayTeam As String = GetBetfairFootballTeam(False, strBetfairEventName)
 
                     ' /----------------------------------------------------------------\
                     ' | MySql Select                                                   |
@@ -226,8 +225,8 @@ Public Class BetFairDatabaseClass
                     ' \----------------------------------------------------------------/
                     cmdEvent.CommandText = "select `id`, date_format(startDate, '%Y-%m-%d') from event AS e where e.`name` =@eventName AND " &
                                            "date(e.startdate) = str_to_date(@startDate, '%Y-%m-%d')"
-                    strConvertedDeatils = ConvertEventName(eventTypeId, strBetfairEventName)
-                    cmdEvent.Parameters.AddWithValue("eventName", strConvertedDeatils)
+                    strConvertedDetails = ConvertEventName(eventTypeId, strBetfairEventName)
+                    cmdEvent.Parameters.AddWithValue("eventName", strConvertedDetails)
                     Dim strBetfairOpenDate As String = dtBetfairOpenDate.ToString("yyyy-MM-dd")
                     cmdEvent.Parameters.AddWithValue("startDate", strBetfairOpenDate)
 
@@ -295,7 +294,7 @@ Public Class BetFairDatabaseClass
                                 If strBetfairOpenDate = strEventDate Then
 
                                     ' Declare and populate fields
-                                    intEventIdSpocosy = drEvent.GetInt64(0)
+                                    intEventIdSpocosy = drFuzzyEvent.GetInt64(0)
 
                                 End If
                             End While
@@ -319,7 +318,7 @@ Public Class BetFairDatabaseClass
                         ' | MySql Select                                                   |
                         ' | Get Spocosy betting odds                                       |
                         ' \----------------------------------------------------------------/
-                        cmdBetOffer.CommandText = "SELECT op.`name` AS provider_name, ou.`scope`, ou.iparam, bt.`odds`, bt.`odds_old`, pa.name As participant_name FROM " &
+                        cmdBetOffer.CommandText = "SELECT op.`name` AS provider_name, ou.`scope`, ou.iparam, bt.`odds`, bt.`odds_old`, pa.name As participant_name, ou.dparam, ou.iparam2, ou.dparam2, ou.subtype FROM " &
                                                 "bettingoffer AS bt INNER JOIN outcome AS ou ON bt.`outcomeFK`=ou.`id` INNER JOIN " &
                                                 "odds_provider AS op ON op.`id` = bt.`odds_providerFK` LEFT JOIN " &
                                                 "participant as pa ON pa.id = ou.`iparam` " &
@@ -327,12 +326,35 @@ Public Class BetFairDatabaseClass
                                                 "ou.`objectFK`=@eventId AND " &
                                                 "ou.`del`='no' AND " &
                                                 "ou.`type` =@matchTypeCode AND " &
+                                                "ou.`scope` =@scope AND " &
+                                                "ou.`dparam` in(@dparam) AND " &
                                                 "bt.`del`='no' AND " &
                                                 "op.`del`='no' AND " &
                                                 "bt.`active`='yes' AND " &
                                                 "bt.`is_live`='no'"
                         cmdBetOffer.Parameters.AddWithValue("eventId", intEventIdSpocosy)
-                        cmdBetOffer.Parameters.AddWithValue("matchTypeCode", strConvertedMarketTypeCode)
+                        Select Case marketTypeCode
+                            Case "MATCH_ODDS"
+                                cmdBetOffer.Parameters.AddWithValue("scope", "ord")
+                                cmdBetOffer.Parameters.AddWithValue("dparam", 0)
+                                cmdBetOffer.Parameters.AddWithValue("matchTypeCode", "1x2")
+                            Case "HALF_TIME"
+                                cmdBetOffer.Parameters.AddWithValue("scope", "1h")
+                                cmdBetOffer.Parameters.AddWithValue("dparam", 0)
+                                cmdBetOffer.Parameters.AddWithValue("matchTypeCode", "1x2")
+                            Case "HALF_TIME_FULL_TIME"
+                                cmdBetOffer.Parameters.AddWithValue("scope", "ord")
+                                cmdBetOffer.Parameters.AddWithValue("dparam", 0)
+                                cmdBetOffer.Parameters.AddWithValue("matchTypeCode", "ht_ft")
+                            Case "OVER_UNDER_25"
+                                cmdBetOffer.Parameters.AddWithValue("scope", "ord")
+                                cmdBetOffer.Parameters.AddWithValue("dparam", 2.5)
+                                cmdBetOffer.Parameters.AddWithValue("matchTypeCode", "ou")
+                            Case "CORRECT_SCORE"
+                                cmdBetOffer.Parameters.AddWithValue("scope", "ord")
+                                cmdBetOffer.Parameters.AddWithValue("dparam", "0,1,2,3,4")
+                                cmdBetOffer.Parameters.AddWithValue("matchTypeCode", "cs")
+                        End Select
 
                         Try
                             cno2.Open()
@@ -353,22 +375,59 @@ Public Class BetFairDatabaseClass
                                         Select Case marketTypeCode
                                             Case "MATCH_ODDS"
                                                 strParticipant_name = "The Draw"
+                                            Case "HALF_TIME"
+                                                strParticipant_name = "The Draw"
+                                            Case "HALF_TIME_FULL_TIME"
+                                                strParticipant_name = "The Draw"
                                         End Select
                                     Else
                                         strParticipant_name = drBetOffer.GetString(5)
                                     End If
+                                    Dim dparam As Double = drBetOffer.GetDouble(6)
+                                    Dim iparam2 As Integer = drBetOffer.GetInt64(7)
+                                    Dim dparam2 As Double = drBetOffer.GetDouble(8)
+                                    Dim subtype As String = drBetOffer.GetString(9)
 
                                     Dim blnStore As Boolean = False
                                     Select Case marketTypeCode
                                         Case "MATCH_ODDS"
-                                            If scope = "ord" Then
-
-                                                If strParticipant_name = strBetfairBetName Then
-                                                    blnStore = True
-                                                End If
-
+                                            If strParticipant_name = strBetfairBetName Then
+                                                blnStore = True
                                             End If
 
+                                        Case "HALF_TIME"
+                                            If strParticipant_name = strBetfairBetName Then
+                                                blnStore = True
+                                            End If
+
+                                        Case "HALF_TIME_FULL_TIME"
+                                            If strParticipant_name = strBetfairBetName Then
+                                                blnStore = True
+                                            End If
+
+                                        Case "OVER_UNDER_25"
+                                            If subtype = "under" Then
+                                                If strBetfairBetName = "Under 2.5 Goals" Then
+                                                    strParticipant_name = "Under 2.5"
+                                                    blnStore = True
+                                                End If
+                                            End If
+                                            If subtype = "over" Then
+                                                If strBetfairBetName = "Over 2.5 Goals" Then
+                                                    strParticipant_name = "Over 2.5"
+                                                    blnStore = True
+                                                End If
+                                            End If
+
+                                        Case "CORRECT_SCORE"
+                                            If subtype = "score" Then
+                                                If strBetfairBetName = dparam.ToString + " - " + dparam2.ToString Then
+                                                    If strParticipant_name = strBetfairHomeTeam Then
+                                                        strParticipant_name = strBetfairBetName
+                                                        blnStore = True
+                                                    End If
+                                                End If
+                                            End If
                                     End Select
 
                                     If blnStore Then
@@ -393,9 +452,10 @@ Public Class BetFairDatabaseClass
                                          .available = dbBetfairSize,
                                          .details = strBetfairEventName,
                                          .bookMaker = strBookmakerImage,
+                                         .bookMakerName = provider_name,
                                          .bet = strParticipant_name,
                                          .exchange = "/images/betfair_exchange.png",
-                                         .type = marketTypeCode,
+                                         .type = ConvertMarketTypeCodeToDisplay(marketTypeCode),
                                          .back = odds,
                                          .rating = dblRating
                                         }
@@ -465,26 +525,41 @@ Public Class BetFairDatabaseClass
 
     End Function
 
-    Public Function ConvertMarketTypeCode(ByVal marketTypeCode As String) As String
+    Public Function GetBetfairFootballTeam(ByVal homeTeam As Boolean, ByVal eventName As String) As String
+
+        Dim strReturn As String = eventName
+
+        Dim strVersus As String = " v "
+        Dim posVersus As Integer = eventName.IndexOf(strVersus, 0)
+        If homeTeam Then
+            strReturn = eventName.Substring(0, posVersus)
+        Else
+            strReturn = eventName.Substring(posVersus + 3)
+        End If
+
+        Return strReturn
+
+    End Function
+
+    Public Function ConvertMarketTypeCodeToDisplay(ByVal marketTypeCode As String) As String
 
         Dim strReturn As String
 
         Select Case marketTypeCode
             Case "MATCH_ODDS"
+                strReturn = "Match Odds"
 
-                strReturn = "1x2"
+            Case "HALF_TIME"
+                strReturn = "Half Time"
 
-            Case "HOME_AWAY"
+            Case "HALF_TIME_FULL_TIME"
+                strReturn = "HT/FT"
 
-                strReturn = "12"
+            Case "OVER_UNDER_25"
+                strReturn = "Over Under"
 
-            Case "OVER_UNDER"
-
-                strReturn = "ou"
-
-            Case "OVER_UNDER"
-
-                strReturn = "cs"
+            Case "CORRECT_SCORE"
+                strReturn = "Correct Score"
 
             Case Else
 
@@ -660,6 +735,7 @@ Public Class BetFairDatabaseClass
         cmd.Parameters.Add("@rating", MySqlDbType.Double)
         cmd.Parameters.Add("@info", MySqlDbType.String)
         cmd.Parameters.Add("@bookmaker", MySqlDbType.String)
+        cmd.Parameters.Add("@bookmaker_name", MySqlDbType.String)
         cmd.Parameters.Add("@back", MySqlDbType.Double)
         cmd.Parameters.Add("@exchange", MySqlDbType.String)
         cmd.Parameters.Add("@lay", MySqlDbType.Double)
@@ -670,7 +746,7 @@ Public Class BetFairDatabaseClass
         cmd.Parameters.Add("@countryCode", MySqlDbType.String)
         cmd.Parameters.Add("@timezone", MySqlDbType.String)
 
-        cmd.CommandText = "INSERT INTO `oddsmatching`.`matched_event` (`eventDate`,`sport`,`details`,`betName`,`marketName`,`rating`,`info`,`bookmaker`,`back`,`exchange`,`lay`,`size`,`betfairEventTypeId`,`betfairMarketTypeCode`,`competitionName`,`countryCode`,`timezone`) VALUES (@eventDate,@sport,@details,@betName,@marketName,@rating,@info,@bookmaker,@back,@exchange,@lay,@size,@betfairEventTypeId,@betfairMarketTypeCode,@competitionName,@countryCode,@timezone)"
+        cmd.CommandText = "INSERT INTO `oddsmatching`.`matched_event` (`eventDate`,`sport`,`details`,`betName`,`marketName`,`rating`,`info`,`bookmaker`,`bookmaker_name`,`back`,`exchange`,`lay`,`size`,`betfairEventTypeId`,`betfairMarketTypeCode`,`competitionName`,`countryCode`,`timezone`) VALUES (@eventDate,@sport,@details,@betName,@marketName,@rating,@info,@bookmaker,@bookmaker_name,@back,@exchange,@lay,@size,@betfairEventTypeId,@betfairMarketTypeCode,@competitionName,@countryCode,@timezone)"
 
         num = 0
         Try
@@ -701,6 +777,7 @@ Public Class BetFairDatabaseClass
                     cmd.Parameters("@rating").Value = matchedList(i).rating
                     cmd.Parameters("@info").Value = "/images/info.png"
                     cmd.Parameters("@bookmaker").Value = matchedList(i).bookMaker
+                    cmd.Parameters("@bookmaker_name").Value = matchedList(i).bookMakerName
                     cmd.Parameters("@back").Value = matchedList(i).back
                     cmd.Parameters("@exchange").Value = matchedList(i).exchange
                     cmd.Parameters("@lay").Value = matchedList(i).lay

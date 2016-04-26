@@ -7,6 +7,7 @@
     Public Property type As String
     Public Property rating As Double
     Public Property bookMaker As String
+    Public Property bookMakerName As String
     Public Property back As Double
     Public Property exchange As String
     Public Property lay As Double
