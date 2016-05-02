@@ -57,7 +57,7 @@
 
                 ' Match new odds
                 Dim BetFairDbOddsMatch5 As New BetFairDatabaseClass()
-                BetFairDbOddsMatch5.MatchSoccerWithBookmakers(1, "CORRECT_SCORE")
+                BetFairDbOddsMatch5.MatchSoccerWithBookmakers(1, "HALF_TIME_FULL_TIME")
                 BetFairDbOddsMatch5 = Nothing
 
 

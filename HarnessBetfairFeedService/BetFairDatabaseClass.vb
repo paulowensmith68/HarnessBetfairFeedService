@@ -318,16 +318,18 @@ Public Class BetFairDatabaseClass
                         ' | MySql Select                                                   |
                         ' | Get Spocosy betting odds                                       |
                         ' \----------------------------------------------------------------/
-                        cmdBetOffer.CommandText = "SELECT op.`name` AS provider_name, ou.`scope`, ou.iparam, bt.`odds`, bt.`odds_old`, pa.name As participant_name, ou.dparam, ou.iparam2, ou.dparam2, ou.subtype FROM " &
+                        cmdBetOffer.CommandText = "SELECT op.`name` AS provider_name, ou.`scope`, ou.iparam, bt.`odds`, bt.`odds_old`, pa.name As participant_name, ou.dparam, ou.iparam2, ou.dparam2, ou.subtype, pa2.name As participant_name2 FROM " &
                                                 "bettingoffer AS bt INNER JOIN outcome AS ou ON bt.`outcomeFK`=ou.`id` INNER JOIN " &
                                                 "odds_provider AS op ON op.`id` = bt.`odds_providerFK` LEFT JOIN " &
-                                                "participant as pa ON pa.id = ou.`iparam` " &
-                                                "WHERE ou.`object`='event' AND " &
+                                                "participant as pa ON pa.id = ou.`iparam`  LEFT JOIN " &
+                                                "participant As pa2 ON pa2.id = ou.`iparam2` " &
+                                                "WHERE ou.`Object`='event' AND " &
                                                 "ou.`objectFK`=@eventId AND " &
                                                 "ou.`del`='no' AND " &
                                                 "ou.`type` =@matchTypeCode AND " &
                                                 "ou.`scope` =@scope AND " &
                                                 "ou.`dparam` in(@dparam) AND " &
+                                                "ou.`dparam2` in(@dparam) AND " &
                                                 "bt.`del`='no' AND " &
                                                 "op.`del`='no' AND " &
                                                 "bt.`active`='yes' AND " &
@@ -377,8 +379,6 @@ Public Class BetFairDatabaseClass
                                                 strParticipant_name = "The Draw"
                                             Case "HALF_TIME"
                                                 strParticipant_name = "The Draw"
-                                            Case "HALF_TIME_FULL_TIME"
-                                                strParticipant_name = "The Draw"
                                         End Select
                                     Else
                                         strParticipant_name = drBetOffer.GetString(5)
@@ -387,6 +387,12 @@ Public Class BetFairDatabaseClass
                                     Dim iparam2 As Integer = drBetOffer.GetInt64(7)
                                     Dim dparam2 As Double = drBetOffer.GetDouble(8)
                                     Dim subtype As String = drBetOffer.GetString(9)
+                                    Dim strParticipant_name2 As String = ""
+                                    If drBetOffer.IsDBNull(10) Then
+                                    Else
+                                        strParticipant_name2 = drBetOffer.GetString(10)
+                                    End If
+
 
                                     Dim blnStore As Boolean = False
                                     Select Case marketTypeCode
@@ -401,8 +407,40 @@ Public Class BetFairDatabaseClass
                                             End If
 
                                         Case "HALF_TIME_FULL_TIME"
-                                            If strParticipant_name = strBetfairBetName Then
-                                                blnStore = True
+
+                                            Dim strHalfTimeName As String = GetBetfairHalfTimeFullTimeTeam(True, strBetfairBetName)
+                                            Dim strFullTimeName As String = GetBetfairHalfTimeFullTimeTeam(False, strBetfairBetName)
+                                            Dim strBookmakersBetName As String = ""
+                                            Dim strBookmakersHalfTime As String = ""
+                                            Dim strBookmakersFullTime As String = ""
+
+                                            ' Build bet name equivalent
+                                            If strParticipant_name = "" Then
+                                                strBookmakersHalfTime = "Draw"
+                                            End If
+                                            If strParticipant_name2 = "" Then
+                                                strBookmakersFullTime = "Draw"
+                                            End If
+                                            If strParticipant_name.Contains(strBetfairHomeTeam) Then
+                                                strBookmakersHalfTime = strBetfairHomeTeam
+                                            End If
+                                            If strParticipant_name.Contains(strBetfairAwayTeam) Then
+                                                strBookmakersHalfTime = strBetfairAwayTeam
+                                            End If
+                                            If strParticipant_name2.Contains(strBetfairHomeTeam) Then
+                                                strBookmakersFullTime = strBetfairHomeTeam
+                                            End If
+                                            If strParticipant_name2.Contains(strBetfairAwayTeam) Then
+                                                strBookmakersFullTime = strBetfairAwayTeam
+                                            End If
+                                            strBookmakersBetName = strBookmakersHalfTime + "/" + strBookmakersFullTime
+
+                                            ' Handle win/win
+                                            If subtype = "win" Or subtype = "win_draw" Or subtype = "draw" Then
+                                                If strBetfairBetName = strBookmakersBetName Then
+                                                    strParticipant_name = strBetfairBetName
+                                                    blnStore = True
+                                                End If
                                             End If
 
                                         Case "OVER_UNDER_25"
@@ -421,15 +459,27 @@ Public Class BetFairDatabaseClass
 
                                         Case "CORRECT_SCORE"
                                             If subtype = "score" Then
-                                                If strBetfairBetName = dparam.ToString + " - " + dparam2.ToString Then
-                                                    If strParticipant_name = strBetfairHomeTeam Then
+                                                ' Check which way around correct score is stored
+                                                ' Home team was in iparam, Away team in iparam2?
+                                                If strParticipant_name.Contains(strBetfairHomeTeam) Then
+                                                    If strBetfairBetName = dparam.ToString + " - " + dparam2.ToString Then
                                                         strParticipant_name = strBetfairBetName
                                                         blnStore = True
                                                     End If
                                                 End If
+                                                ' Reversed, Away team in iparam, Home team was in iparam2?
+                                                If strParticipant_name.Contains(strBetfairAwayTeam) Then
+                                                    If strBetfairBetName = dparam2.ToString + " - " + dparam.ToString Then
+                                                        strParticipant_name = strBetfairBetName
+                                                        blnStore = True
+                                                    End If
+                                                End If
+
                                             End If
+
                                     End Select
 
+                                    ' Store the match
                                     If blnStore Then
 
                                         ' Calculate rating 
@@ -438,11 +488,10 @@ Public Class BetFairDatabaseClass
                                         ' Resolve bookmaker name to image
                                         Dim strBookmakerImageName = provider_name
                                         strBookmakerImageName = strBookmakerImageName.Replace(" ", "_")
-                                        strBookmakerImageName = strBookmakerImageName.Replace(".", "")
-                                        strBookmakerImageName = strBookmakerImageName.Replace("-", "_")
+                                        strBookmakerImageName = strBookmakerImageName.Replace(".", "_")
                                         strBookmakerImageName = strBookmakerImageName.Replace("-", "_")
                                         strBookmakerImageName = strBookmakerImageName.ToLower
-                                        Dim strBookmakerImage As String = "/images/" + strBookmakerImageName + ".png"
+                                        Dim strBookmakerImage As String = "/images/" + strBookmakerImageName + ".gif"
 
                                         'Create instance of Matched Event class
                                         newMatched = New MatchedEventClass With {
@@ -454,7 +503,7 @@ Public Class BetFairDatabaseClass
                                          .bookMaker = strBookmakerImage,
                                          .bookMakerName = provider_name,
                                          .bet = strParticipant_name,
-                                         .exchange = "/images/betfair_exchange.png",
+                                         .exchange = "/images/betfair_exchange.gif",
                                          .type = ConvertMarketTypeCodeToDisplay(marketTypeCode),
                                          .back = odds,
                                          .rating = dblRating
@@ -535,6 +584,21 @@ Public Class BetFairDatabaseClass
             strReturn = eventName.Substring(0, posVersus)
         Else
             strReturn = eventName.Substring(posVersus + 3)
+        End If
+
+        Return strReturn
+
+    End Function
+    Public Function GetBetfairHalfTimeFullTimeTeam(ByVal halftime As Boolean, ByVal betName As String) As String
+
+        Dim strReturn As String = betName
+
+        Dim strSlash As String = "/"
+        Dim posSlash As Integer = betName.IndexOf(strSlash, 0)
+        If halftime Then
+            strReturn = betName.Substring(0, posSlash)
+        Else
+            strReturn = betName.Substring(posSlash + 1)
         End If
 
         Return strReturn
