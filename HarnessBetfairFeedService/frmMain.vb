@@ -6,7 +6,7 @@
             Dim marketCountriesUkOnly As HashSet(Of String)
             marketCountriesUkOnly = New HashSet(Of String)({"GB"})
             Dim marketCountriesEurope As HashSet(Of String)
-            marketCountriesEurope = New HashSet(Of String)({"FR", "DE", "IT", "ES"})
+            marketCountriesEurope = New HashSet(Of String)({"FR", "DE", "IT", "ES", "PT", "NL", "GR"})
 
             ' Refresh database from BetFair API interface
 
@@ -19,14 +19,14 @@
                 'gobjEvent.WriteToEventLog("StartProcess:    *--------------------------------------------------")
                 'gobjEvent.WriteToEventLog("StartProcess:    *-----  BefFairFeedService - Updating Football ----")
                 'gobjEvent.WriteToEventLog("StartProcess:    *--------------------------------------------------")
-                Dim BetFairDatabase1 As New BetFairDatabaseClass()
-                BetFairDatabase1.PollBetFairEvents(1, "MATCH_ODDS", My.Settings.NumberOfUkEvents, marketCountriesUkOnly, True)
-                BetFairDatabase1 = Nothing
+                'Dim BetFairDatabase1 As New BetFairDatabaseClass()
+                'BetFairDatabase1.PollBetFairEvents(1, "MATCH_ODDS", My.Settings.NumberOfUkEvents, marketCountriesUkOnly, True)
+                'BetFairDatabase1 = Nothing
 
                 ''' Europe leagues
-                ''Dim BetFairDatabase2 As New BetFairDatabaseClass()
-                ''BetFairDatabase2.PollBetFairEvents(1, "MATCH_ODDS", My.Settings.NumberOfEuropenEvents, marketCountriesEurope, False)
-                ''BetFairDatabase2 = Nothing
+                'Dim BetFairDatabase2 As New BetFairDatabaseClass()
+                'BetFairDatabase2.PollBetFairEvents(1, "MATCH_ODDS", My.Settings.NumberOfEuropenEvents, marketCountriesEurope, False)
+                'BetFairDatabase2 = Nothing
 
                 ' Match new odds
                 Dim BetFairDbOddsMatch1 As New BetFairDatabaseClass()

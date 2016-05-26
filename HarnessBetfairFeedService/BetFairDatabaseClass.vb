@@ -296,7 +296,7 @@ Public Class BetFairDatabaseClass
 
                                     ' Declare and populate fields
                                     intEventIdSpocosy = drFuzzyEvent.GetInt64(0)
-                                    strEventStageSpocosy = drEvent.GetString(2)
+                                    strEventStageSpocosy = drFuzzyEvent.GetString(2)
 
                                 End If
                             End While
