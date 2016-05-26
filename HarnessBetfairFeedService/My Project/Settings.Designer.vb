@@ -66,17 +66,6 @@ Namespace My
             End Set
         End Property
         
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083"& _ 
-            "cb50265fec;Password=263fb5f7;persistsecurityinfo=True")>  _
-        Public ReadOnly Property ConnectionString() As String
-            Get
-                Return CType(Me("ConnectionString"),String)
-            End Get
-        End Property
-        
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("saber_cbm")>  _
@@ -139,7 +128,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Soccer")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Football")>  _
         Public Property StreamSportName() As String
             Get
                 Return CType(Me("StreamSportName"),String)
@@ -151,7 +140,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("3")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
         Public Property DaysAhead() As Integer
             Get
                 Return CType(Me("DaysAhead"),Integer)
@@ -163,19 +152,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("5")>  _
-        Public Property NumberOfEuropenEvents() As Integer
-            Get
-                Return CType(Me("NumberOfEuropenEvents"),Integer)
-            End Get
-            Set
-                Me("NumberOfEuropenEvents") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("100")>  _
         Public Property NumberOfUkEvents() As Integer
             Get
                 Return CType(Me("NumberOfUkEvents"),Integer)
@@ -188,12 +165,131 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("120")>  _
-        Public Property ProcessCycleEverySecs() As String
+        Public Property ProcessCycleEverySecs() As Integer
             Get
-                Return CType(Me("ProcessCycleEverySecs"),String)
+                Return CType(Me("ProcessCycleEverySecs"),Integer)
             End Get
             Set
                 Me("ProcessCycleEverySecs") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property Process_MATCH_ODDS() As Boolean
+            Get
+                Return CType(Me("Process_MATCH_ODDS"),Boolean)
+            End Get
+            Set
+                Me("Process_MATCH_ODDS") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Process_HALF_TIME() As Boolean
+            Get
+                Return CType(Me("Process_HALF_TIME"),Boolean)
+            End Get
+            Set
+                Me("Process_HALF_TIME") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Process_HALF_TIME_FULL_TIME() As Boolean
+            Get
+                Return CType(Me("Process_HALF_TIME_FULL_TIME"),Boolean)
+            End Get
+            Set
+                Me("Process_HALF_TIME_FULL_TIME") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Process_OVER_UNDER_25() As Boolean
+            Get
+                Return CType(Me("Process_OVER_UNDER_25"),Boolean)
+            End Get
+            Set
+                Me("Process_OVER_UNDER_25") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property Prcoess_CORRECT_SCORE() As Boolean
+            Get
+                Return CType(Me("Prcoess_CORRECT_SCORE"),Boolean)
+            End Get
+            Set
+                Me("Prcoess_CORRECT_SCORE") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Process_BOTH_TEAMS_TO_SCORE() As Boolean
+            Get
+                Return CType(Me("Process_BOTH_TEAMS_TO_SCORE"),Boolean)
+            End Get
+            Set
+                Me("Process_BOTH_TEAMS_TO_SCORE") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Prcoess_WIN() As Boolean
+            Get
+                Return CType(Me("Prcoess_WIN"),Boolean)
+            End Get
+            Set
+                Me("Prcoess_WIN") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property Process_PLACE() As Boolean
+            Get
+                Return CType(Me("Process_PLACE"),Boolean)
+            End Get
+            Set
+                Me("Process_PLACE") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083"& _ 
+            "cb50265fec;Password=263fb5f7;persistsecurityinfo=True")>  _
+        Public ReadOnly Property ConnectionString() As String
+            Get
+                Return CType(Me("ConnectionString"),String)
+            End Get
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("5")>  _
+        Public Property NumberOfEuropenEvents() As Integer
+            Get
+                Return CType(Me("NumberOfEuropenEvents"),Integer)
+            End Get
+            Set
+                Me("NumberOfEuropenEvents") = value
             End Set
         End Property
     End Class

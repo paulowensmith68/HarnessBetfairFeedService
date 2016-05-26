@@ -5,13 +5,6 @@
     <Setting Name="ProcessLogPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\#myPrograms\BetFairFeedService\logs\</Value>
     </Setting>
-    <Setting Name="ConnectionString" Type="(Connection string)" Scope="Application">
-      <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083cb50265fec;Password=263fb5f7;persistsecurityinfo=True&lt;/ConnectionString&gt;
-&lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083cb50265fec;Password=263fb5f7;persistsecurityinfo=True</Value>
-    </Setting>
     <Setting Name="BetFairAccountName" Type="System.String" Scope="User">
       <Value Profile="(Default)">saber_cbm</Value>
     </Setting>
@@ -28,19 +21,50 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="StreamSportName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Soccer</Value>
+      <Value Profile="(Default)">Football</Value>
     </Setting>
     <Setting Name="DaysAhead" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="NumberOfUkEvents" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="ProcessCycleEverySecs" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">120</Value>
+    </Setting>
+    <Setting Name="Process_MATCH_ODDS" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Process_HALF_TIME" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Process_HALF_TIME_FULL_TIME" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Process_OVER_UNDER_25" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Prcoess_CORRECT_SCORE" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Process_BOTH_TEAMS_TO_SCORE" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Prcoess_WIN" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Process_PLACE" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ConnectionString" Type="(Connection string)" Scope="Application">
+      <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;ConnectionString&gt;Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083cb50265fec;Password=263fb5f7;persistsecurityinfo=True&lt;/ConnectionString&gt;
+&lt;/SerializableConnectionString&gt;</DesignTimeValue>
+      <Value Profile="(Default)">Database=OddsMatching;Data Source=eu-cdbr-azure-north-e.cloudapp.net;User Id=b083cb50265fec;Password=263fb5f7;persistsecurityinfo=True</Value>
     </Setting>
     <Setting Name="NumberOfEuropenEvents" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
-    </Setting>
-    <Setting Name="NumberOfUkEvents" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
-    </Setting>
-    <Setting Name="ProcessCycleEverySecs" Type="System.String" Scope="User">
-      <Value Profile="(Default)">120</Value>
     </Setting>
   </Settings>
 </SettingsFile>

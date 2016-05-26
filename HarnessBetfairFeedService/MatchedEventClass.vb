@@ -12,5 +12,6 @@
     Public Property exchange As String
     Public Property lay As Double
     Public Property available As Double
+    Public Property competitionName As String
 
 End Class
